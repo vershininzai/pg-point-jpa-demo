@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet author="avershinin" id="1" dbms="postgresql">
+        <sql>
+            create table test_table
+            (
+            id uuid,
+            coord point
+            );
+        </sql>
+    </changeSet>
+    <changeSet author="avershinin" id="2" dbms="postgresql">
+        <sqlFile path="point-from-string.sql" splitStatements="false" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="avershinin" id="3" dbms="postgresql">
+        <sql>
+            DROP CAST IF EXISTS (varchar AS point);
+            CREATE CAST (varchar AS point)
+            WITH FUNCTION pointFromString (varchar)
+            AS IMPLICIT;
+        </sql>
+    </changeSet>
+
+    <changeSet author="avershinin" id="4" dbms="postgresql">
+        <sql>
+            create extension "uuid-ossp";
+        </sql>
+    </changeSet>
+    <changeSet author="avershinin" id="5" dbms="postgresql">
+        <sql>
+            insert into test_table(id, coord) VALUES (uuid_generate_v1(), point(1.22, 3.44));
+            insert into test_table(id, coord) VALUES (uuid_generate_v1(), point(2.22, 4.44));
+            insert into test_table(id, coord) VALUES (uuid_generate_v1(), point(3.22, 5.44));
+        </sql>
+    </changeSet>
+</databaseChangeLog>
